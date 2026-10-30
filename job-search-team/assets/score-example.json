@@ -1,0 +1,4 @@
+{
+  "weights": {"match": 30, "growth": 10, "salary_cost": 20, "work_reviews": 15, "industry_reputation": 25},
+  "ratings": {"match": 4, "growth": 4, "salary_cost": 4, "work_reviews": null, "industry_reputation": 4}
+}

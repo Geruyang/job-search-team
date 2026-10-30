@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>简历网页助手</title><link rel="stylesheet" href="control.css"></head>
+<body><main>
+<header><h1>简历网页助手</h1><p>本机自动连接 · 无调试器 · 可手动撤销标签权限</p></header>
+<section><h2>1. 连接本机服务</h2><p>首次导入配对文件后，配对密钥保存在本机扩展存储；以后启动本机服务并打开控制面板时自动连接。</p>
+<label class="file">导入配对文件 <input id="pairFile" type="file" accept="application/json,.json"></label>
+<p id="pairStatus">尚未导入</p><button id="connect" disabled>连接</button> <button id="disconnect" disabled>停止连接</button> <button id="forget">忘记配对</button><p id="connection" role="status">未连接</p>
+<p>保持这个控制面板标签页打开，可以切换到其他窗口工作。关闭面板会停止领取新任务。</p></section>
+<section><h2>2. 选择允许操作的页面</h2><p>仅列出猎聘与 BOSS，新发现的页面自动开启读取和操作；可在此取消勾选以撤销权限。请核对当前登录账号。</p>
+<button id="refresh">重新列出页面</button><div id="tabs"></div></section>
+<section><h2>3. 运行状态</h2><p>这里只显示任务类型与结果状态，不记录简历正文。遇到验证码、登录或不支持的控件时请人工处理。</p><pre id="events" aria-live="polite"></pre></section>
+</main><script src="control.js"></script></body></html>

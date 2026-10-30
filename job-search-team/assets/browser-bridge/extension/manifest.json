@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "简历网页助手 · 本机连接",
+  "version": "0.2.0",
+  "description": "本机自动连接，并可在控制面板撤销猎聘和BOSS页面操作权限；不使用调试器。",
+  "permissions": [
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://www.liepin.com/*",
+    "https://c.liepin.com/*",
+    "https://www.zhipin.com/*",
+    "https://cv.zhipin.com/*",
+    "http://127.0.0.1/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "打开简历网页助手控制面板"
+  },
+  "options_page": "control.html",
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'"
+  }
+}

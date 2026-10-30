@@ -1,0 +1,25 @@
+{
+  "policy_version": "draft-1",
+  "status": "needs_user_confirmation",
+  "confirmation": {"weights": null, "vetoes": null, "hr_activity": null, "job_updated_at": null},
+  "timezone": "Asia/Shanghai",
+  "platforms": ["boss", "liepin"],
+  "cities": [],
+  "directions": [],
+  "weights": {"match": 30, "growth": 10, "salary_cost": 20, "work_reviews": 15, "industry_reputation": 25},
+  "anonymous_employer": {"allow_selection": false, "weight_mode": "derive_from_current_three", "custom_weights": null},
+  "veto_unknown_policy": "pass_with_insufficient_evidence_label",
+  "vetoes": [
+    {"id": "small_and_not_top5", "enabled": true, "logic": "AND", "employee_count_lt": 500, "industry_rank_gt": 5, "scope": "国内所属细分行业知名度", "evidence": "两个条件均充分证实"},
+    {"id": "frequent_workplace_issues", "enabled": true, "issues": ["单休", "严重加班", "薪资不实", "管理混乱"], "evidence": "任一问题频繁出现，多个独立相关可靠来源，注明时期和团队"},
+    {"id": "salary_floor", "enabled": true, "monthly_lower_bound_lt": 15000, "currency": "CNY", "basis": "挂牌税前月薪下限"}
+  ],
+  "hr_activity": {"mode": "off", "window_days": null, "window_hours": null, "basis": "calendar_days", "unknown": "keep_flagged"},
+  "job_updated_at": {"mode": "off", "window_days": null, "window_hours": null, "basis": "calendar_days", "unknown": "keep_flagged"},
+  "job_published_at": {"mode": "off", "window_days": null, "window_hours": null, "basis": "calendar_days", "unknown": "keep_flagged"},
+  "time_note": "off为未确认草案占位，不代表用户已确认不限时间；三类字段分别确认，可按平台覆盖",
+  "experience_years": "soft_match_factor",
+  "salary_cost": {"housing_area_proxy": 40, "nonhousing_monthly": 2500, "user_budget": null},
+  "execution": {"mode": "research_only", "authorization_ref": null, "quota": null, "schedule": null, "resume_changes": false},
+  "agent_runtime": {"provider": null, "model": null, "role_models": {}, "execution_mode": "host_capability_based", "evaluation_priority": "strongest_available_reasoning", "user_selection_ref": null}
+}
