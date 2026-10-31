@@ -40,3 +40,8 @@ Never commit your runtime `.local` directory, tokens, resume or private conversa
 If useful, star the repository or share it with someone looking for their next role.
 
 Licensed under the [MIT License](LICENSE).
+
+## Community Interaction
+
+This project acknowledges and supports the [LINUX DO Community](https://linux.do/).
+Feel free to visit the community to discuss open source and technology.
