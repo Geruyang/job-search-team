@@ -58,6 +58,10 @@
     const regular = Array.from(document.querySelectorAll('button,a,input,textarea,select,label,li,option,[tabindex],[contenteditable],[role="button"],[role="textbox"],[role="combobox"],[role="listbox"],[role="menuitem"],[role="checkbox"],[role="radio"],[role="option"],[role="tab"],[data-nick="resume-edit-icon"]')).filter(element => element.getAttribute('contenteditable') === null || element.isContentEditable || ['INPUT','TEXTAREA','SELECT','BUTTON','A','LABEL','LI','OPTION'].includes(element.tagName) || element.getAttribute('role') || element.getAttribute('tabindex') !== null);
     const plainActions = Array.from(document.querySelectorAll('span,div')).filter(element =>
       element.children.length === 0 && ACTION_TEXT.test(clean(element.innerText || element.textContent)));
+    // Liepin's visible unread-message entry has no button role or pointer cursor.
+    // Expose that observed entry without changing the normal visibility/hit checks.
+    const unreadEntries = Array.from(document.querySelectorAll('div.im-ui-basic-entry-title'))
+      .filter(element => clean(element.innerText || element.textContent) === '有新消息');
     const pointerControls = Array.from(document.querySelectorAll('button,a,label,span,div,i,svg')).slice(0, 6000).filter(element => {
       if (!visible(element) || getComputedStyle(element).cursor !== 'pointer') return false;
       const parent = element.parentElement;
@@ -66,7 +70,7 @@
     const scrollContainers = Array.from(document.querySelectorAll('div,ul,ol,section,[role="listbox"]')).slice(0,6000).filter(element => visible(element) && scrollable(element));
     const covers = regular.filter(element => visible(element) && (['INPUT','TEXTAREA','SELECT'].includes(element.tagName) || element.isContentEditable)).map(element => centerHit(element)?.hit)
       .filter(element => element && visible(element) && !['BODY','HTML'].includes(element.tagName));
-    let found = Array.from(new Set([...regular, ...plainActions, ...pointerControls, ...scrollContainers, ...covers])).filter(visible);
+    let found = Array.from(new Set([...regular, ...plainActions, ...unreadEntries, ...pointerControls, ...scrollContainers, ...covers])).filter(visible);
     const total = found.length;
     if (total > 250) {
       const score = element => {

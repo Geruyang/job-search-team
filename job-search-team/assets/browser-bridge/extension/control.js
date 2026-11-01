@@ -64,7 +64,7 @@ async function execute(command, generation) {
   const tab = await chrome.tabs.get(command.tabId);
   if (!allowed(tab.url)) throw new Error('该页面不在站点范围内');
   if (command.expectedUrl && tab.url !== command.expectedUrl) throw new Error('页面地址已变化，请重新读取');
-  if (command.action !== 'snapshot' && !permission.writeEnabled) throw new Error('该标签当前只读');
+  if (!['snapshot','screenshot'].includes(command.action) && !permission.writeEnabled) throw new Error('该标签当前只读');
   if (command.action === 'open-observed-job' || command.action === 'open-observed-search') {
     await chrome.scripting.executeScript({target:{tabId:command.tabId},files:['content.js'],world:'ISOLATED'});
     if (!connected || generation !== loopGeneration || Date.now() >= command.expiresAt || !selected.get(command.tabId)?.writeEnabled) throw new Error('导航前任务或操作权限已撤销');
@@ -77,7 +77,72 @@ async function execute(command, generation) {
   }
   await chrome.scripting.executeScript({target:{tabId:command.tabId},files:['content.js'],world:'ISOLATED'});
   if (!connected || generation !== loopGeneration || Date.now() >= command.expiresAt || !selected.has(command.tabId)) throw new Error('任务已停止、撤销或过期');
-  if (command.action !== 'snapshot' && !selected.get(command.tabId).writeEnabled) throw new Error('操作权限已撤销');
+  if (!['snapshot','screenshot'].includes(command.action) && !selected.get(command.tabId).writeEnabled) throw new Error('操作权限已撤销');
+  if (command.action === 'screenshot') {
+    // Only activate a selected recruiting page after verifying its current document.
+    // No window focusing or navigation is needed for captureVisibleTab.
+    const initial=await chrome.tabs.sendMessage(command.tabId,{type:'resume-bridge-command',command:{action:'snapshot'}});
+    const candidate=await chrome.tabs.get(command.tabId);
+    if(!initial?.ok || initial.result.documentId!==command.documentId || initial.result.url!==command.expectedUrl || candidate.url!==command.expectedUrl || candidate.windowId!==tab.windowId) throw new Error('切换前页面或文档已变化');
+    if(!selected.has(command.tabId) || !connected || generation!==loopGeneration || Date.now()>=command.expiresAt) throw new Error('切换前读取权限、连接或任务状态已变化');
+    if(!candidate.active) await chrome.tabs.update(command.tabId,{active:true});
+    // captureVisibleTab captures whichever tab is active, so discard the image on any
+    // activation/navigation/focus change even if the original tab is restored later.
+    const targetWindowId=tab.windowId;
+    let changed=false;
+    const onActive=info=>{if(info.windowId===targetWindowId)changed=true;};
+    const onUpdate=(id,info)=>{if(id===command.tabId && (info.url!==undefined || info.status==='loading'))changed=true;};
+    const onRemove=id=>{if(id===command.tabId)changed=true;};
+    const onFocus=()=>{changed=true;};
+    chrome.tabs.onActivated.addListener(onActive); chrome.tabs.onUpdated.addListener(onUpdate);
+    chrome.tabs.onRemoved.addListener(onRemove); chrome.windows.onFocusChanged.addListener(onFocus);
+    try {
+      const before=await chrome.tabs.sendMessage(command.tabId,{type:'resume-bridge-command',command:{action:'snapshot'}});
+      const current=await chrome.tabs.get(command.tabId);
+      if(!before?.ok || before.result.documentId!==command.documentId || before.result.url!==command.expectedUrl || current.url!==command.expectedUrl) throw new Error('截图前页面或文档已变化');
+      if(!current.active || current.windowId!==targetWindowId) throw new Error('截图前目标标签未在指定窗口处于活动状态');
+      if(changed) throw new Error('截图准备期间标签、页面或窗口焦点发生变化');
+      if(!selected.has(command.tabId) || !connected || generation!==loopGeneration || Date.now()>=command.expiresAt) throw new Error('截图前读取权限、连接或任务状态已变化');
+      const beforeWindow=await chrome.windows.get(targetWindowId);
+      let image;
+      let captureTimer;
+      try {
+        const timeout=new Promise((_,reject)=>{captureTimer=setTimeout(()=>reject(new Error('浏览器截图接口超时，未取得图片')),10000);});
+        image=await Promise.race([chrome.tabs.captureVisibleTab(targetWindowId,{format:'jpeg',quality:65}),timeout]);
+      }
+      catch (error) {
+        // Browser failures can also be caused by unsupported APIs or platform limits.
+        // Keep a bounded diagnostic without exposing page URLs or claiming a cause.
+        const detail=String(error?.message || error || '浏览器未提供错误详情')
+          .replace(/(?:https?|chrome-extension):\/\/\S+/gi,'[地址已隐藏]')
+          .replace(/[\r\n\t]+/g,' ').slice(0,300);
+        throw new Error(`浏览器截图调用失败：${detail}`);
+      }
+      finally { clearTimeout(captureTimer); }
+      const after=await chrome.tabs.get(command.tabId);
+      const afterWindow=await chrome.windows.get(targetWindowId);
+      const afterDoc=await chrome.tabs.sendMessage(command.tabId,{type:'resume-bridge-command',command:{action:'snapshot'}});
+      if(changed || beforeWindow.state!==afterWindow.state || !after.active || after.windowId!==targetWindowId || after.url!==command.expectedUrl || !afterDoc?.ok || afterDoc.result.documentId!==command.documentId || afterDoc.result.url!==command.expectedUrl || !selected.has(command.tabId) || !connected || generation!==loopGeneration || Date.now()>=command.expiresAt) throw new Error('截图期间页面、焦点、窗口状态或读取权限已变化，已丢弃截图');
+      if(typeof image!=='string' || !image.startsWith('data:image/jpeg;base64,') || image.length>3*1024*1024) throw new Error('截图无效或过大');
+      const windowState=afterWindow.state || 'unknown';
+      const freshnessUnverified=windowState==='minimized' || windowState==='unknown';
+      const note=freshnessUnverified?'窗口最小化或状态未知，图像可能滞后，不能单凭截图确认弹窗或发送结果；请核对页面当前状态。':'仅为目标标签当前可见区域，截图新鲜度仍需与页面交叉核对。';
+      return {image,url:command.expectedUrl,documentId:command.documentId,windowState,freshnessUnverified,note};
+    } finally {
+      chrome.tabs.onActivated.removeListener(onActive); chrome.tabs.onUpdated.removeListener(onUpdate);
+      chrome.tabs.onRemoved.removeListener(onRemove); chrome.windows.onFocusChanged.removeListener(onFocus);
+    }
+  }
+  if (command.action === 'activate') {
+    const before = await chrome.tabs.sendMessage(command.tabId,{type:'resume-bridge-command',command:{action:'snapshot'}});
+    if (!before?.ok || before.result.documentId !== command.documentId || before.result.url !== command.expectedUrl) throw new Error('文档已变化，拒绝切换');
+    const current = await chrome.tabs.get(command.tabId);
+    if (!connected || generation !== loopGeneration || Date.now() >= command.expiresAt || !selected.get(command.tabId)?.writeEnabled || current.url !== command.expectedUrl) throw new Error('切换前页面、任务或操作权限已变化');
+    await chrome.tabs.update(command.tabId,{active:true});
+    await chrome.windows.update(current.windowId,{focused:true});
+    const after = await chrome.tabs.get(command.tabId);
+    return {activated:after.active === true, note:'已请求切换到现有标签及其窗口；请重新读取页面。'};
+  }
   if(command.action==='reload') {
     const before = await chrome.tabs.sendMessage(command.tabId,{type:'resume-bridge-command',command:{action:'snapshot'}});
     if(!before.ok || before.result.documentId!==command.documentId || before.result.url!==command.expectedUrl) throw new Error('文档已变化，拒绝刷新');

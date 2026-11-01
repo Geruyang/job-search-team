@@ -75,6 +75,7 @@ function fixture() {
   const document = {
     title: 'Test resume', body: {},
     querySelectorAll(selector) {
+      if (selector === 'div.im-ui-basic-entry-title') return elements.filter(element => element.tagName==='DIV' && (element.attrs.class||'').split(/\s+/).includes('im-ui-basic-entry-title'));
       if (selector === 'span,div') return elements.filter(element => ['SPAN','DIV'].includes(element.tagName));
       if (selector === 'button,a,label,span,div,i,svg') return elements.filter(element => ['BUTTON','A','LABEL','SPAN','DIV','I','SVG'].includes(element.tagName));
       if (selector === 'div,ul,ol,section,[role="listbox"]') return elements.filter(element=>['DIV','UL','OL','SECTION'].includes(element.tagName)||element.attrs.role==='listbox');
@@ -106,6 +107,15 @@ function fixture() {
   return {elements,Element,Input,TextArea,Select,context,command,mutation,location,document,
     rawListener:()=>listener,count:()=>listenerCount};
 }
+
+test('visible Liepin unread entry is discoverable and remains hit-tested', async () => {
+  const f=fixture(); const entry=new f.Element('DIV',{class:'im-ui-basic-entry-title'},'有新消息');
+  const {result:s}=await f.command({action:'snapshot'});
+  const field=s.fields.find(item=>item.label==='有新消息');
+  assert.ok(field);
+  const result=await f.command(f.mutation(s,'click',field.ref));
+  assert.equal(result.ok,true);assert.equal(entry.clicked,true);
+});
 
 test('snapshot reads visible fields and redacts passwords and OTP fields', async () => {
   const f = fixture();

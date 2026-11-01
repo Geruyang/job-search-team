@@ -7,3 +7,17 @@ Thumbs.db
 *.log
 .env
 .env.*
+
+# Private evidence and user input are never release inputs.
+**/session.json
+**/extension-pairing.json
+**/initialization.json
+**/policy.json
+**/screenshots/
+*.pdf
+*.docx
+*.doc
+*.png
+*.jpg
+*.jpeg
+*.webp

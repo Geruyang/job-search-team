@@ -5,8 +5,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
-const ACTIONS = new Set(['tabs', 'snapshot', 'click', 'fill', 'select', 'scroll', 'reload', 'open-observed-job', 'open-observed-search']);
-const WRITES = new Set(['click', 'fill', 'select', 'scroll', 'reload', 'open-observed-job', 'open-observed-search']);
+const ACTIONS = new Set(['tabs', 'snapshot', 'screenshot', 'click', 'fill', 'select', 'scroll', 'reload', 'activate', 'open-observed-job', 'open-observed-search']);
+const WRITES = new Set(['click', 'fill', 'select', 'scroll', 'reload', 'activate', 'open-observed-job', 'open-observed-search']);
 const ORIGIN = /^chrome-extension:\/\/[a-p]{32}$/;
 const MAX_BODY = 512 * 1024;
 const MAX_RECORDS = 500;
@@ -50,11 +50,11 @@ function bad(message, status = 400) {
   const error = new Error(message); error.status = status; return error;
 }
 
-async function body(req) {
+async function body(req, maxBody = MAX_BODY) {
   let length = 0; const chunks = [];
   for await (const chunk of req) {
     length += chunk.length;
-    if (length > MAX_BODY) throw bad('Request body too large', 413);
+    if (length > maxBody) throw bad('Request body too large', 413);
     chunks.push(chunk);
   }
   try { return JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}'); }
@@ -74,6 +74,7 @@ function validateCommand(input) {
   if (WRITES.has(input.action)) {
     if (typeof input.documentId !== 'string' || !input.documentId || input.documentId.length > 200) throw bad('documentId is required');
   }
+  if (input.action === 'screenshot' && (!allowedUrl(input.expectedUrl) || typeof input.documentId !== 'string' || !input.documentId || input.documentId.length > 200)) throw bad('Screenshot requires an allowed expectedUrl and documentId');
   if (['open-observed-job','open-observed-search'].includes(input.action) && (typeof input.targetUrl!=='string' || input.targetUrl.length>3000)) throw bad('targetUrl is required');
   if (['click', 'fill', 'select'].includes(input.action)) {
     if (typeof input.ref !== 'string' || !input.ref || input.ref.length > 200) throw bad('Element ref is required');
@@ -151,6 +152,10 @@ export async function createBridge({ port = 17373, directory = path.join(ROOT, '
     if (!tab) throw bad('Tab is not selected in the connected extension', 409);
     if (command.expectedUrl && tab.url !== command.expectedUrl) throw bad('Tab URL changed; take a fresh snapshot', 409);
     if (WRITES.has(command.action) && !tab.writeEnabled) throw bad('Tab is read-only; enable editing explicitly in the extension', 403);
+    if (command.action === 'screenshot') {
+      const guard=observed.get(liveAgent()?.clientId)?.documents.get(command.tabId);
+      if (!guard || now()-guard.at>DOCUMENT_GUARD_TTL_MS || guard.url!==command.expectedUrl || guard.documentId!==command.documentId) throw bad('Current document guard is missing or stale',403);
+    }
     if (command.action === 'open-observed-job' || command.action === 'open-observed-search') {
       const registry=observed.get(liveAgent()?.clientId);
       const source=registry?.documents.get(command.tabId);
@@ -204,7 +209,7 @@ export async function createBridge({ port = 17373, directory = path.join(ROOT, '
         send(200, view(record)); return;
       }
       if (req.method === 'POST' && agentRoute) {
-        const data = await body(req);
+        const data = await body(req, url.pathname === '/v1/agent/result' ? 4 * 1024 * 1024 : MAX_BODY);
         if (typeof data.clientId !== 'string' || !/^[A-Za-z0-9_-]{8,100}$/.test(data.clientId)) throw bad('Invalid clientId');
         if (liveAgent() && agent.clientId !== data.clientId) throw bad('Another extension client holds the lease', 409);
         if (agent?.clientId === data.clientId && agent.origin !== origin) throw bad('Client origin changed', 403);
@@ -234,6 +239,8 @@ export async function createBridge({ port = 17373, directory = path.join(ROOT, '
         const record = records.get(data.id);
         if (!record || record.clientId !== data.clientId) throw bad('Unknown command or wrong client', 404);
         if (typeof data.ok !== 'boolean') throw bad('ok must be boolean');
+        if (record.action !== 'screenshot' && Buffer.byteLength(JSON.stringify(data),'utf8') > MAX_BODY) throw bad('Request body too large',413);
+        if (data.ok && record.action === 'screenshot' && (typeof data.result?.image !== 'string' || !/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(data.result.image) || data.result.image.length > 3 * 1024 * 1024)) throw bad('Invalid screenshot result');
         const digest=createHash('sha256').update(JSON.stringify({ok:data.ok,result:data.result,error:data.error})).digest('hex');
         if(record.resultDigest !== undefined) {
           if(record.resultDigest !== digest) throw bad('Conflicting duplicate result',409);
@@ -246,6 +253,12 @@ export async function createBridge({ port = 17373, directory = path.join(ROOT, '
         record.resultDigest=digest;
         if (record.status === 'expired') record.lateAcknowledgement = { ok: data.ok, receivedAt: now() };
         else {
+          if (data.ok && record.action === 'screenshot') {
+            // Keep at most the latest image in memory; all command metadata remains available.
+            for (const other of records.values()) if (other.action==='screenshot' && other.result?.image) {
+              delete other.result.image; other.result.imageDiscarded=true;
+            }
+          }
           record.status = data.ok ? 'succeeded' : 'failed'; record.result = data.result; record.error = data.ok ? undefined : String(data.error || 'Extension operation failed').slice(0,2000); record.completedAt = now();
           if (data.ok && record.action==='snapshot' && data.result && data.result.url===record.expectedUrl && typeof data.result.documentId==='string' && Array.isArray(data.result.fields)) {
             const plat=platform(record.expectedUrl);

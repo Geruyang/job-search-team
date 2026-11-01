@@ -19,9 +19,9 @@ Windows也可用已有PowerShell入口：
 脚本在工作区 `.job-search-assistant/browser-bridge` 创建或复用助手，不搜索其他项目目录，已有目录不覆盖；输出助手路径、健康、连接状态、扩展路径及配对文件路径，不输出令牌。Node入口用 `--bridge-root`，PowerShell入口用 `-BridgeRoot` 指向先前安装。只部署不启动可分别用 `--prepare-only` / `-PrepareOnly`。已占用端口先确认现有服务及其目录，不杀进程、不重启正在处理的命令。服务健康不等于扩展连接，connected不等于账号、标签和权限正确。
 
 1. Node缺失时明确缺少的运行时及可用安装方式，按环境允许方式安装；不要声称已完成。本地服务用隐藏进程，不修改开机启动项。
-2. 扩展已安装：打开已有控制面板，等待自动连接，再CLI核验。若配对缺失，使用允许的可见UI导入助手 `.local/extension-pairing.json` 并连接，不读出密钥。0.2版配对保存在扩展storage，面板重开自动恢复；不沿用0.1版“刷新必丢配对”的过时说明。
+2. 扩展已安装：打开已有控制面板，等待自动连接，再CLI核验。若配对缺失，使用允许的可见UI导入助手 `.local/extension-pairing.json` 并连接，不读出密钥。2.0版配对保存在扩展storage，面板重开自动恢复；不沿用0.1版“刷新必丢配对”的过时说明。
 3. 首次加载：同一浏览器的扩展管理页→开发者模式→加载已解压→选择输出的extension目录→点扩展图标打开控制面板→导入输出的配对文件。使用用户选择且支持加载本地扩展的Chrome、Edge或其他兼容Chromium浏览器；已有登录和扩展配置优先复用。宿主浏览器工具策略可能禁止扩展管理页/面板：被阻止时请用户完成此步，不换机制绕过限制；之后自动继续。
-4. 在同一浏览器配置中由用户登录正确账号；不迁移Cookie。0.2面板会默认为发现的招聘标签授予读写，必须核对并撤销本轮无关页权限。这是工具权限，不是发送授权。面板保持打开；关闭则停止领取任务。
+4. 在同一浏览器配置中由用户登录正确账号；不迁移Cookie。2.0面板会默认为发现的招聘标签授予读写，必须核对并撤销本轮无关页权限。这是工具权限，不是发送授权。面板保持打开；关闭则停止领取任务。
 5. 先用 `status`、`tabs`、`snapshot` 做只读验收。新装/异常恢复后可在约2分钟内分散做3次观察，确认网址、文档及正常页面稳定，不以模拟测试冒充在线成功。配置缺失时继续独立资料整理，等待必要人工步骤。
 
 ## CLI与操作约束
@@ -33,6 +33,7 @@ node cli.mjs health
 node cli.mjs status
 node cli.mjs tabs
 node cli.mjs snapshot <真实tabId>
+node cli.mjs screenshot <真实tabId> <新的本地图片路径.jpg>
 node cli.mjs send <本轮命令JSON的绝对路径>
 node cli.mjs result <返回的任务ID>
 ```
@@ -45,7 +46,7 @@ node cli.mjs result <返回的任务ID>
 
 用结构化JSON写命令，UTF-8无BOM，保留真实换行。命令、草稿和回执按平台/角色/唯一批次隔离；发送前核对全文，避免同名值文件互相覆盖。
 
-支持snapshot/click/fill/select/scroll/reload及open-observed-job/open-observed-search；导航要求当前tabId、expectedUrl、documentId及targetUrl。targetUrl必须来自同client同平台成功快照中实际出现的链接；目录每URL保留30分钟、上限2000，目标标签当前守卫5分钟。只允许既有工具范围：BOSS job_detail或web/geek/jobs，猎聘job/a详情或zhaopin搜索。不得猜拼目标、放松守卫或修改白名单来操作未观察链接。
+支持snapshot/screenshot/activate/click/fill/select/scroll/reload及open-observed-job/open-observed-search；导航要求当前tabId、expectedUrl、documentId及targetUrl。targetUrl必须来自同client同平台成功快照中实际出现的链接；目录每URL保留30分钟、上限2000，目标标签当前守卫5分钟。只允许既有工具范围：BOSS job_detail或web/geek/jobs，猎聘job/a详情或zhaopin搜索。不得猜拼目标、放松守卫或修改白名单来操作未观察链接。
 
 search snapshot登记列表href→打开职位A→落地snapshot→打开目录内职位B→落地snapshot。不逐岗返回搜索/刷新；仅换城市、词、分页或目录过期时正常回列表重新观察。`navigationRequested`只代表发起，不证明落地。对最新可见链接，click的 `value:"open-in-same-tab"` 可正常同页打开，须当前ref且目标无遮挡。
 
@@ -54,9 +55,9 @@ search snapshot登记列表href→打开职位A→落地snapshot→打开目录�
 ## BOSS：避免无谓刷新与重复操作
 
 - BOSS业务页统一经助手控制，不再用其他浏览器自动化工具绑定同页或混用第二控制通道。不要定时刷新、每读一岗刷新、失败后循环reload；正常搜索筛选、列表内导航、聊天列表重开优先。
-- 首页跳转、弹窗迟滞、遮罩残留、文档自变时暂停写入，保存进度和在途动作，重新status/snapshot核验。旧文档/ref全部失效。先正常关闭弹窗、等待动画、滚动或展开应用完整视图并激活目标页；不删遮罩、不改CSS、不点隐藏控件。
+- 首页跳转、弹窗迟滞、遮罩残留、文档自变时暂停写入，保存进度和在途动作，重新status/snapshot核验。旧文档/ref全部失效。先在已有授权内切回BOSS目标标签并等待，再读取回执；必要时正常关闭弹窗、等待动画或滚动；不删遮罩、不改CSS、不点隐藏控件。
 - 必要恢复时确认无在途/未知提交，再由所有者执行最多一次受守卫reload；仍失败则停止该页动作并报告，必要时通过正常UI新建页面和重新授权。历史“新标签+前台可见”组合有效，不能断言已定位唯一根因。
-- 回执优先聊天列表正常重开；不为了验收每条消息强制刷新。正文关联送达且重开保留可计沟通，不称已读；“双方回复后可用”的附件入口不得绕过，只计沟通。
+- 回执优先聊天列表正常重开；不为了验收每条消息强制刷新。正文关联送达且重开保留可计沟通，不称已读；“双方回复后可用”的附件入口不得绕过。请求发送、附件可见和平台正式投递分别记录，统计按本轮用户确认的口径。
 
 ## 猎聘：已知问题与对策
 
@@ -72,3 +73,13 @@ search snapshot登记列表href→打开职位A→落地snapshot→打开目录�
 控制面板休眠/服务断开时先恢复连接并查在途任务，不重放命令。未知动作可能锁页，不能重启服务清锁来重发；先从实际聊天/投递历史对账。服务结果内存有限，及时落盘本轮回执。不要执行 `pair --show` 或传播session/配对文件。
 
 运行 `node --test tests/*.test.mjs` 验证随包桥接逻辑；这是模拟DOM/Chrome API测试，不能证明当前站点、账号或长期后台稳定。真实验收先只读，再在用户实际任务授权内小样本操作，不额外发测试消息。首次人工安装与登录限制是当前环境能力边界，不承诺零人工永久运行。
+
+## V2.0 截图与发送核验
+
+详细操作顺序及解决状态见 [故障复用](troubleshooting.md)，初次使用按 [验收矩阵](acceptance.md)。图片仅存用户本地，模型图像识别由使用本技能的宿主提供，插件不内置OCR或视觉模型。
+
+截图自动切换活动标签，使用前确认用户允许；`activate` 的命令形如 `{"action":"activate","tabId":123,"expectedUrl":"当前真实URL","documentId":"最新快照ID","timeoutMs":45000}`，ID和地址必须来自实时快照。它请求切换现有标签并聚焦窗口，不重新导航。
+
+截图前后核对文档、URL、活动页和窗口状态，发生变化丢弃结果。截图调用10秒超时会清理监听器；不能把超时归因为权限不足，保留实际错误。最小化或状态未知返回 `freshnessUnverified=true`；即使为false也不能证明同URL内会话未切换，须结合截图内容核对人、岗位和附件。截图失败或陈旧时，按用户授权采用文字回执，仍不足则待核，禁止因图像不清重复发送。
+
+`visual-capture.mjs` 与 `visual-guard.mjs` 仅为实验性外部图像提供方协调器，未随包提供真正的独立截图后端；不能宣称它们能自行捕获隐藏内嵌页。当前可用主路径是本机 Chrome 扩展截图。

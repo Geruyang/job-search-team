@@ -1,10 +1,10 @@
-# AI 求职小组 · Job Search Team
+# AI 求职小组 · Job Search Team V2.0
 
 **让 AI 帮你找岗位、读 JD、比较机会，再按你的授权沟通投递。**
 
 一个可迁移、可配置的求职 Agent Skill，附带 BOSS 直聘 / 猎聘本机网页助手。你决定求职方向、评分权重和一票否决项；AI 负责整理证据、分工执行和核对结果。
 
-[下载完整技能包](releases/job-search-team-portable-20261030-standalone.zip) · [从零安装](job-search-team/references/setup.md) · [技能入口](job-search-team/SKILL.md) · [English](README.en.md)
+[下载V2.0完整技能包](releases/job-search-team-V2.0.zip) · [下载V2.0独立助手](releases/resume-browser-assistant-V2.0.zip) · [仅Chrome扩展](releases/resume-browser-extension-V2.0.zip) · [从零安装](job-search-team/references/setup.md) · [技能入口](job-search-team/SKILL.md) · [English](README.en.md)
 
 ## 你只管决定什么工作值得去
 
@@ -27,7 +27,7 @@
 
 将完整技能目录导入支持文件与本机工具的智能体环境，然后告诉它：
 
-> 使用这个求职技能，先帮我确认求职方向、评分权重、一票否决项、HR 活跃和岗位更新时间要求。检查并搭建网页助手，搜索适合我的岗位并说明证据。先不要联系 HR 或投递。
+> 使用这个求职技能，先收集我的简历、目标、评分占比、否决项和所需权限，再编写或适配安装助手，让我登录招聘平台，尽可能验收功能。先筛选，不联系HR或投递。
 
 已有偏好也可以直接说：
 
@@ -35,16 +35,19 @@
 
 初始评分预设为 **30 / 10 / 20 / 15 / 25**，只是待确认模板。适用于你的策略，由你决定。
 
-## 三步搭建
+## 初始化与搭建
 
-1. 下载并解压上方技能包，保留完整目录。准备 **Node.js ≥22**、兼容 Chromium 扩展的桌面浏览器，以及一个空白可写工作区。
+1. 先私下提供自己的简历、目标、评分占比、否决项和所需权限；可沿用已确认内容，不要求全部授权。详见[初始化清单](job-search-team/references/initialization.md)。下载解压完整技能包，准备 **Node.js ≥22**、兼容 Chromium 扩展的桌面浏览器，以及一个空白可写工作区。
 2. 替换实际路径后执行：
 
 ```sh
 node "<技能目录>/scripts/ensure-assistant.mjs" --workspace "<工作区>"
 ```
 
-3. 按输出路径加载本地扩展、导入配对文件，在同一浏览器登录招聘账号。确认连接、标签权限和页面读取成功后开始筛选。
+3. 按输出路径安装/加载插件、接受所需浏览器权限、导入本机配对文件，再由用户在同一浏览器登录招聘平台。
+4. 按[功能验收表](job-search-team/references/acceptance.md)尽可能检查所有功能：未测与失败明确标记，真实外发只在获准任务中验证。
+
+助手支持Chrome活动标签截图与自动切页，不主动刷新。图片识别由宿主图像工具完成；最小化可能出现旧画面或失败，按授权使用文字回执。BOSS附件弹窗迟滞优先切回目标页，不重复发送。详情见[故障与最终办法](job-search-team/references/troubleshooting.md)。
 
 运行代码只使用 Node 内置模块，**无需 Python，无需 npm install**。完整步骤、首次验收和常见问题见[安装说明](job-search-team/references/setup.md)。
 
@@ -64,9 +67,9 @@ flowchart LR
 
 ## 已验证什么
 
-独立技能包在原项目以外的临时目录解压后，**76 项测试通过**：67 项桥接测试、7 项计分测试、2 项部署与复用测试。覆盖空工作区、中文和空格路径、首次启动、新配对生成、重复启动及不覆盖既有目录。
+V2.0的86项本机自动测试通过：77项桥接/图像逻辑、7项评分、2项部署与复用测试。独立解压包也须通过相同验收，详见[发布验证](job-search-team/VALIDATION.md)。测试使用Windows本机临时服务及模拟浏览器，不代表所有网站/系统已实机通过。
 
-测试在 Windows 完成。浏览器 API 和 DOM 测试使用模拟页面，不等于对所有操作系统、LLM 宿主或网站当前版本完成真实验收。
+当日历史实测曾确认独立Chrome两平台截图和双向切页；最小化实时图像、锁屏和长期无人值守仍不保证。公开包不携带真实截图或聊天证据。新环境必须自行验收。
 
 ## 使用前了解这几点
 

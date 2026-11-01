@@ -70,6 +70,26 @@ test('commands need connected selected tabs, allowed origins, write opt-in and s
   assert.equal((await f.enqueue(write)).status,202);
 });
 
+test('screenshots require a fresh document guard and selected tab, but not write permission',async t=>{
+  const f=await fixture(t); await f.poll([{...tab,writeEnabled:false}]);
+  const shot={action:'screenshot',tabId:7,expectedUrl:tab.url,documentId:'doc-screenshot'};
+  assert.equal((await f.enqueue({...shot,documentId:undefined})).status,400);
+  assert.equal((await f.enqueue(shot)).status,403);
+  const snap=(await f.enqueue({action:'snapshot',tabId:7,expectedUrl:tab.url})).body;
+  await f.poll([{...tab,writeEnabled:false}]);
+  await f.ack(snap.id,{result:{documentId:'doc-screenshot',url:tab.url,fields:[]}});
+  assert.equal((await f.enqueue({...shot,documentId:'different'})).status,403);
+  const created=(await f.enqueue(shot));assert.equal(created.status,202);
+  await f.poll([{...tab,writeEnabled:false}]);
+  assert.equal((await f.ack(created.body.id,{result:{image:'not-an-image'}})).status,400);
+  const accepted=await f.ack(created.body.id,{result:{image:'data:image/jpeg;base64,'+'A'.repeat(600*1024),url:tab.url,documentId:'doc-screenshot'}});
+  assert.equal(accepted.status,200);
+  const retrieved=await f.request('/v1/results/'+created.body.id);
+  assert.equal(retrieved.status,200);
+  assert.equal(retrieved.body.status,'succeeded');
+  assert.equal(retrieved.body.result.image,'data:image/jpeg;base64,'+'A'.repeat(600*1024));
+});
+
 test('observed job navigation requires a successful same-tab snapshot, exact observed URL, current document and write opt-in',async t=>{
   const f=await fixture(t); await f.poll();
   const job='https://www.liepin.com/job/123456.shtml?track=1';
