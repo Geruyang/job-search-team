@@ -21,3 +21,14 @@ Thumbs.db
 *.jpg
 *.jpeg
 *.webp
+
+# Private knowledge, conversation and interest-tracking runtime files.
+**/求职知识库/
+**/解决方案知识库/
+**/incidents.jsonl
+**/人工干预记录.md
+**/重点岗位.md
+**/attitude-tracking.json
+**/claims.json
+**/receipts.json
+**/jobs.json

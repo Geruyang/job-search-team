@@ -32,5 +32,7 @@
   "communication": {"template_files": [], "agent_suffix": null, "introduce_before_resume": null},
   "receipts": {"delivery_counting": null, "preserve_raw_status": true, "deduplicate_by_opportunity": true},
   "storage": {"private_workspace": null, "retention_days": null, "public_export": "sanitized_code_and_docs_only"},
+  "solution_knowledge": {"enabled": null, "private_path": null, "authorization_ref": null, "decision": "offer_on_first_use", "declining_does_not_block_skill": true, "record_human_intervention": true, "consult_at_start_and_before_recovery": true, "public_export": false},
+  "recruiter_interest": {"enabled": true, "tracking_file": null, "focus_report": null, "review_every_contacted_jobs": 20, "read_no_reply_retire_after_days": 3, "all_pending_retire_after_days": 7, "strictly_exceeds": true, "new_inbound_still_processed": true, "review_is_read_only": true},
   "acceptance_report": null
 }

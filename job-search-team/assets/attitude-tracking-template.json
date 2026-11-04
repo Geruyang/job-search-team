@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "tracking_started_at": null,
+  "timezone": "Asia/Shanghai",
+  "history_coverage_note": "首次使用时填写可核验历史范围；未知总量不能填零冒充全历史",
+  "completed_review_boundaries": [],
+  "outreach_events": [],
+  "jobs": [],
+  "reviews": []
+}

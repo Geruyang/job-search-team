@@ -1,10 +1,12 @@
-# Job Search Team V2.0
+# Job Search Team
 
 **A portable agent skill for finding jobs, evaluating evidence, and applying with your authorization.**
 
 Includes a local browser assistant for BOSS Zhipin and Liepin. Configure scoring weights, veto rules, recruiter activity and job freshness. Run with multiple agents or one model working through the roles sequentially.
 
-[V2.0 skill](releases/job-search-team-V2.0.zip) · [Standalone assistant](releases/resume-browser-assistant-V2.0.zip) · [Chrome extension only](releases/resume-browser-extension-V2.0.zip) · [Setup guide (Chinese)](job-search-team/references/setup.md) · [中文](README.md)
+[Latest skill (2026-11-05)](releases/job-search-team-2026-11-05.zip) · [Standalone assistant](releases/resume-browser-assistant-V2.0.zip) · [Chrome extension only](releases/resume-browser-extension-V2.0.zip) · [Setup guide (Chinese)](job-search-team/references/setup.md) · [中文](README.md)
+
+The latest update adds an optional private solution knowledge base, recruiter-interest tracking and a review after every 20 contacted jobs. The original [V2.0 skill archive](releases/job-search-team-V2.0.zip) is preserved. Browser-assistant runtime code is unchanged in this update.
 
 ## Why use it?
 
@@ -14,6 +16,9 @@ Includes a local browser assistant for BOSS Zhipin and Liepin. Configure scoring
 - Clear ownership of browser tabs, files, communication and application receipts.
 - Bundled extension, local service and CLI; no author-specific paths or credentials.
 - Model-provider independent instructions and a single Node.js runtime dependency.
+- Optional local incident and human-intervention records, consulted before recovery; declining the knowledge base does not block use.
+- Evidence-based recruiter interest and a focused list of opportunities with next steps.
+- A read-only attitude review every 20 contacted jobs, including greeting-only contacts, without counting later resume sends again.
 
 ## Quick start
 
@@ -31,13 +36,15 @@ No Python or npm packages are required. The current detailed skill instructions 
 
 ## Validation and limits
 
+The new offline review planner passes 8 behavioral tests. Pending opportunities leave routine review after more than three days if read without any recruiter reply, or after more than seven days regardless of read status. Later incoming messages are still handled. The planner does not operate recruiting websites or infer real interest without conversation evidence.
+
 V2.0 has 86 passing local automated tests: 77 bridge/visual logic tests, 7 scoring tests and 2 deployment/reuse tests. See the [validation report](job-search-team/VALIDATION.md) for extracted-package checks. Tested on Windows, including blank workspaces and paths with spaces and Chinese characters. Browser API and DOM tests are simulated; this is not a claim of live compatibility with every operating system, host or future website version.
 
 The assistant can capture Chrome’s active tab and switch authorized recruiting tabs without reloading. Minimized captures may be stale or fail; check current conversation and text receipts. The extension supplies images, not an embedded vision model. Attachment-request receipts can count as delivery if the user chooses that metric; retain the original state and do not infer acceptance or reading.
 
 Automatic website operation needs tools running on the same machine as the browser, or an authorized local tool connection. A cloud-only chat cannot directly access your machine's loopback service. First-time extension installation, account login and verification may require user action. This project does not promise job offers or unattended operation.
 
-Never commit your runtime `.local` directory, tokens, resume or private conversations. Report reproducible issues with sensitive details removed.
+Never commit your runtime `.local` directory, tokens, resume, private conversations, local solution knowledge base or recruiter-interest tracking state. Report reproducible issues with sensitive details removed.
 
 If useful, star the repository or share it with someone looking for their next role.
 
