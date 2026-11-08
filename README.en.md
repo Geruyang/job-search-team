@@ -4,9 +4,9 @@
 
 Includes a local browser assistant for BOSS Zhipin and Liepin. Configure scoring weights, veto rules, recruiter activity and job freshness. Run with multiple agents or one model working through the roles sequentially.
 
-[Latest skill (2026-11-05)](releases/job-search-team-2026-11-05.zip) · [Standalone assistant](releases/resume-browser-assistant-V2.0.zip) · [Chrome extension only](releases/resume-browser-extension-V2.0.zip) · [Setup guide (Chinese)](job-search-team/references/setup.md) · [中文](README.md)
+[Latest skill (2026-11-08)](releases/job-search-team-2026-11-08.zip) · [Standalone assistant](releases/resume-browser-assistant-V2.0.zip) · [Chrome extension only](releases/resume-browser-extension-V2.0.zip) · [Setup guide (Chinese)](job-search-team/references/setup.md) · [中文](README.md)
 
-The latest update adds an optional private solution knowledge base, recruiter-interest tracking and a review after every 20 contacted jobs. The original [V2.0 skill archive](releases/job-search-team-V2.0.zip) is preserved. Browser-assistant runtime code is unchanged in this update.
+The latest update adds a private problem-file workflow: read at startup, consult before recovery, and update both the problem file and local knowledge base after each result or user correction. A consent-based initializer creates empty files and a session handoff entry without overwriting existing history. Recruiter-interest tracking and 20-job reviews remain. The original [V2.0 archive](releases/job-search-team-V2.0.zip) is preserved; browser-assistant runtime code is unchanged.
 
 ## Why use it?
 
@@ -34,7 +34,17 @@ node "<skill-directory>/scripts/ensure-assistant.mjs" --workspace "<workspace>"
 
 No Python or npm packages are required. The current detailed skill instructions and setup guide are in Chinese.
 
+After the user authorizes private knowledge retention, run:
+
+```sh
+node "<skill-directory>/scripts/init-knowledge.mjs" --workspace "<private-workspace>" --enable
+```
+
+Use `--knowledge-dir "<workspace-relative-directory>"` to reuse an existing knowledge directory. Declining retention does not block the skill. Import the complete archive in another session and follow the [handoff guide](job-search-team/references/session-handoff.md). Project instructions are an agent workflow, not a background logging service. Private history must be supplied separately by its owner, never bundled into the public skill.
+
 ## Validation and limits
+
+The source and independently extracted ZIP each pass 101 local tests, including 7 new knowledge-initialization tests for consent, preservation, idempotence, directory boundaries and standalone CLI use. New environments still require browser acceptance checks.
 
 The new offline review planner passes 8 behavioral tests. Pending opportunities leave routine review after more than three days if read without any recruiter reply, or after more than seven days regardless of read status. Later incoming messages are still handled. The planner does not operate recruiting websites or infer real interest without conversation evidence.
 

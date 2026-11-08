@@ -4,9 +4,9 @@
 
 一个可迁移、可配置的求职 Agent Skill，附带 BOSS 直聘 / 猎聘本机网页助手。你决定求职方向、评分权重和一票否决项；AI 负责整理证据、分工执行和核对结果。
 
-[下载最新完整技能包（2026-11-05）](releases/job-search-team-2026-11-05.zip) · [下载V2.0独立助手](releases/resume-browser-assistant-V2.0.zip) · [仅Chrome扩展](releases/resume-browser-extension-V2.0.zip) · [从零安装](job-search-team/references/setup.md) · [技能入口](job-search-team/SKILL.md) · [English](README.en.md)
+[下载最新完整技能包（2026-11-08）](releases/job-search-team-2026-11-08.zip) · [下载V2.0独立助手](releases/resume-browser-assistant-V2.0.zip) · [仅Chrome扩展](releases/resume-browser-extension-V2.0.zip) · [从零安装](job-search-team/references/setup.md) · [技能入口](job-search-team/SKILL.md) · [English](README.en.md)
 
-2026-11-05更新：可选的私有解决方案知识库、招聘者意向与重点岗位跟踪、每联系20岗后的态度复查。旧[V2.0技能包](releases/job-search-team-V2.0.zip)保留；本次助手运行代码未变。
+2026-11-08更新：私有“问题及解决.md”与本地知识库的先查后处理、运行中及时同步，以及跨会话初始化工具。原有招聘者意向与每20岗复查保留；旧[V2.0技能包](releases/job-search-team-V2.0.zip)及历史版本不覆盖。本次助手运行代码未变。
 
 ## 你只管决定什么工作值得去
 
@@ -23,7 +23,7 @@
 | 分工协作 | 总协调与分平台角色，明确标签页和文件所有权 |
 | 本机网页助手 | 随包提供扩展、服务和 CLI，自动部署或复用 |
 | 查重与回执 | 区分聊天送达、附件发送、实际投递，未知结果先对账 |
-| 本地经验库（可选） | 经授权记录问题、有效办法及人工干预，下次启动/恢复先参考；拒绝建库仍可正常使用 |
+| 本地经验库（可选） | 经授权创建空问题文件与知识库；启动先读、遇错先查，每次结果和人工介入当次更新；不覆盖已有记录 |
 | 招聘者意向 | 每次读聊分析HR态度，区分明确推进与初步兴趣，展示重点岗位及下一步 |
 | 每20岗复查 | 仅打招呼也计岗，同平台同需去重；只读检查待定态度，不自动催问 |
 | 可迁移 | 不绑定模型提供方，不依赖作者的项目路径或账号 |
@@ -52,6 +52,16 @@ node "<技能目录>/scripts/ensure-assistant.mjs" --workspace "<工作区>"
 3. 按输出路径安装/加载插件、接受所需浏览器权限、导入本机配对文件，再由用户在同一浏览器登录招聘平台。
 4. 按[功能验收表](job-search-team/references/acceptance.md)尽可能检查所有功能：未测与失败明确标记，真实外发只在获准任务中验证。
 
+经验留存已获授权时，可先运行：
+
+```sh
+node "<技能目录>/scripts/init-knowledge.mjs" --workspace "<私有工作区>" --enable
+```
+
+它创建缺失的空白问题文件、知识库、会话接续入口，并向项目规则追加维护协议；已有内容保留，重复运行不会重复追加。拒绝建库则跳过。已有知识库可通过 `--knowledge-dir "<工作区内相对目录>"` 复用。
+
+其他会话导入完整技能ZIP并按[会话接续说明](job-search-team/references/session-handoff.md)访问自己的私有工作区。只有入口文件或纯云端上传不能代替本机工具。项目规则是Agent要执行的协议，不是后台自动记录服务；个人历史不包含在公开包里。
+
 助手支持Chrome活动标签截图与自动切页，不主动刷新。图片识别由宿主图像工具完成；最小化可能出现旧画面或失败，按授权使用文字回执。BOSS附件弹窗迟滞优先切回目标页，不重复发送。详情见[故障与最终办法](job-search-team/references/troubleshooting.md)。
 
 运行代码只使用 Node 内置模块，**无需 Python，无需 npm install**。完整步骤、首次验收和常见问题见[安装说明](job-search-team/references/setup.md)。
@@ -71,6 +81,8 @@ flowchart LR
 ```
 
 ## 已验证什么
+
+2026-11-08技能源及完整ZIP独立解压后分别101项测试通过，其中新增7项验证知识库初始化的授权、文件保留、目录边界、重复运行和独立CLI。新环境仍须按验收表检查真实浏览器，测试不代表所有宿主已实机兼容。
 
 最新意向复查规划器新增8项通过的离线行为测试，覆盖20岗边界、同岗去重、跨平台计数、未知/失败/人工动作排除、跨轮游标及3日/7日时长。超过3日已读无HR回复，或超过7日的待定岗位退出例行复查；后来有新消息仍优先处理。规划器不操作网页，真实态度需结合原会话判断。详情见[意向跟踪](job-search-team/references/recruiter-interest.md)。
 

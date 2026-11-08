@@ -5,6 +5,7 @@
 | 功能 | 本机模拟/离线测试 | 真实环境验收与边界 |
 |---|---|---|
 | 资料与权重 | 真实输入结构、权重合计、未知分与区间、匿名主体规则 | 简历版本/语言与用户确认一致；示例不作为真实评估 |
+| 私有问题/知识库（可选） | 授权后初始化、拒绝不写入、原文件保留、重复运行、越界拒绝及独立CLI | 核真实问题文件和知识库路径；启动先读，遇错先查，每次结果/纠正当次更新；纯文档协议不冒称后台服务 |
 | 初次搭建与复用 | 空工作区、新配对、重启复用、不覆盖已有文件 | CLI健康、connected、安装加载目录及版本正确 |
 | 连接与权限 | 配对校验、停止连接、撤回权限、错误代际/过期拒绝 | 核对所选平台账号/标签；取消选中后重新读取应被阻止，再在授权内恢复 |
 | 页面与导航 | URL/document/ref守卫、仅允许已观察链接 | 读取JD、搜索列表、历史；导航只在当前任务允许时，不为测试刷新招聘页 |
@@ -23,7 +24,7 @@
 从技能目录运行：
 
 ```sh
-node --test scripts/test-score.mjs scripts/test-bootstrap.mjs assets/browser-bridge/tests/*.test.mjs
+node --test scripts/test-score.mjs scripts/test-bootstrap.mjs scripts/test-attitude-review.mjs scripts/test-knowledge.mjs assets/browser-bridge/tests/*.test.mjs
 ```
 
 测试使用临时服务及模拟浏览器，不需要用户账号，不向招聘平台发送消息。需要本机回环与子进程权限。通过后仍须新环境只读验收；真实发送仅在实际授权任务中补验。测试结果见发布包 `VALIDATION.md`，不把历史实测当作本次实测。

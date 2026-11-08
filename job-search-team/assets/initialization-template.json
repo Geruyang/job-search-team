@@ -1,7 +1,12 @@
 {
   "schema_version": "2.0",
   "status": "needs_user_input",
-  "resume": {"path": null, "version": null, "language": null, "facts_verified": false},
+  "resume": {
+    "path": null,
+    "version": null,
+    "language": null,
+    "facts_verified": false
+  },
   "policy_file": null,
   "permissions": {
     "local_install": false,
@@ -28,11 +33,56 @@
     "edit_resume": false,
     "publish_personal_data": false
   },
-  "authorization": {"source": null, "confirmed_at": null, "scope": null, "quota": null, "stop_conditions": [], "expires_at": null},
-  "communication": {"template_files": [], "agent_suffix": null, "introduce_before_resume": null},
-  "receipts": {"delivery_counting": null, "preserve_raw_status": true, "deduplicate_by_opportunity": true},
-  "storage": {"private_workspace": null, "retention_days": null, "public_export": "sanitized_code_and_docs_only"},
-  "solution_knowledge": {"enabled": null, "private_path": null, "authorization_ref": null, "decision": "offer_on_first_use", "declining_does_not_block_skill": true, "record_human_intervention": true, "consult_at_start_and_before_recovery": true, "public_export": false},
-  "recruiter_interest": {"enabled": true, "tracking_file": null, "focus_report": null, "review_every_contacted_jobs": 20, "read_no_reply_retire_after_days": 3, "all_pending_retire_after_days": 7, "strictly_exceeds": true, "new_inbound_still_processed": true, "review_is_read_only": true},
+  "authorization": {
+    "source": null,
+    "confirmed_at": null,
+    "scope": null,
+    "quota": null,
+    "stop_conditions": [],
+    "expires_at": null
+  },
+  "communication": {
+    "template_files": [],
+    "agent_suffix": null,
+    "introduce_before_resume": null
+  },
+  "receipts": {
+    "delivery_counting": null,
+    "preserve_raw_status": true,
+    "deduplicate_by_opportunity": true
+  },
+  "storage": {
+    "private_workspace": null,
+    "retention_days": null,
+    "public_export": "sanitized_code_and_docs_only"
+  },
+  "solution_knowledge": {
+    "enabled": null,
+    "private_path": null,
+    "authorization_ref": null,
+    "decision": "offer_on_first_use",
+    "declining_does_not_block_skill": true,
+    "record_human_intervention": true,
+    "consult_at_start_and_before_recovery": true,
+    "public_export": false,
+    "problem_file": null,
+    "index_file": null,
+    "maintainer": null,
+    "read_on_handoff_and_context_recovery": true,
+    "consult_before_retry": true,
+    "update_each_problem_attempt_result_or_user_correction": true,
+    "update_before_next_related_business_action": true
+  },
+  "recruiter_interest": {
+    "enabled": true,
+    "tracking_file": null,
+    "focus_report": null,
+    "review_every_contacted_jobs": 20,
+    "read_no_reply_retire_after_days": 3,
+    "all_pending_retire_after_days": 7,
+    "strictly_exceeds": true,
+    "new_inbound_still_processed": true,
+    "review_is_read_only": true
+  },
   "acceptance_report": null
 }
