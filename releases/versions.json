@@ -1,0 +1,48 @@
+{
+  "latest": "V2.1",
+  "releases": [
+    {
+      "sha256": "3d9af3c798eae05fc00d56694d8a47ed38dee42f0ec055f3398d34e5fc3e9426",
+      "canonical": "job-search-team-V1.0.zip",
+      "size": 65639,
+      "legacy_tag": "v1.0.0",
+      "source": "job-search-team-portable-20261030-standalone.zip",
+      "version": "V1.0",
+      "commit": "e712d1378789d2a4f2fd96a089e9db2dd5c60ccc"
+    },
+    {
+      "sha256": "3a3da09f06a557003387787b32d03486437fa08d27643736c168c7d6a406cafe",
+      "canonical": "job-search-team-V2.0.zip",
+      "size": 87135,
+      "legacy_tag": null,
+      "source": "job-search-team-V2.0.zip",
+      "version": "V2.0",
+      "commit": "fdb5cb1b8778e9440c451dbcdba329abbabfe9d0"
+    },
+    {
+      "sha256": "c308b3d1f3a81f6058a4ee0e2cd5b90eda247bff82dc2738b8327adedcef35a7",
+      "canonical": "job-search-team-V2.0.1.zip",
+      "size": 101172,
+      "legacy_tag": null,
+      "source": "job-search-team-2026-11-05.zip",
+      "version": "V2.0.1",
+      "commit": "c0030779da9552dde12dff916867c3dcc4d2a0d4"
+    },
+    {
+      "sha256": "ec74190b5ee3c08e9181a0f5dc13e87386a4913ec7266157f9f20d24c1c37305",
+      "canonical": "job-search-team-V2.1.zip",
+      "size": 110750,
+      "legacy_tag": null,
+      "source": "job-search-team-2026-11-08.zip",
+      "version": "V2.1",
+      "commit": "9e65ca6e060e54dcab923a8d797a9b994a83e6a3"
+    }
+  ],
+  "compatibility": "Legacy tags and date-based package names are preserved aliases, not separate feature versions.",
+  "components": {
+    "release_version": "V2.0",
+    "extension_manifest_version": "2.0.0",
+    "assistant_package_version": "2.0.0",
+    "note": "Unchanged components retain their original distribution and internal versions."
+  }
+}
