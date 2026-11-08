@@ -4,7 +4,7 @@
 
 Includes a local browser assistant for BOSS Zhipin and Liepin. Configure scoring weights, veto rules, recruiter activity and job freshness. Run with multiple agents or one model working through the roles sequentially.
 
-[Latest skill V2.1](releases/job-search-team-V2.1.zip) · [Version map](VERSION_HISTORY.md) · [Standalone assistant V2.0](releases/resume-browser-assistant-V2.0.zip) · [Chrome extension only](releases/resume-browser-extension-V2.0.zip) · [Setup guide (Chinese)](job-search-team/references/setup.md) · [中文](README.md)
+[Latest skill V2.2](releases/job-search-team-V2.2.zip) · [Version map](VERSION_HISTORY.md) · [Standalone assistant V2.0](releases/resume-browser-assistant-V2.0.zip) · [Chrome extension only](releases/resume-browser-extension-V2.0.zip) · [Setup guide (Chinese)](job-search-team/references/setup.md) · [中文](README.md)
 
 The latest update adds a private problem-file workflow: read at startup, consult before recovery, and update both the problem file and local knowledge base after each result or user correction. A consent-based initializer creates empty files and a session handoff entry without overwriting existing history. Recruiter-interest tracking and 20-job reviews remain. The original [V2.0 archive](releases/job-search-team-V2.0.zip) is preserved; browser-assistant runtime code is unchanged.
 

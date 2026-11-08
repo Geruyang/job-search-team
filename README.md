@@ -4,9 +4,9 @@
 
 一个可迁移、可配置的求职 Agent Skill，附带 BOSS 直聘 / 猎聘本机网页助手。你决定求职方向、评分权重和一票否决项；AI 负责整理证据、分工执行和核对结果。
 
-[下载V2.1完整技能包](releases/job-search-team-V2.1.zip) · [版本对照](VERSION_HISTORY.md) · [下载V2.0独立助手](releases/resume-browser-assistant-V2.0.zip) · [仅Chrome扩展](releases/resume-browser-extension-V2.0.zip) · [从零安装](job-search-team/references/setup.md) · [技能入口](job-search-team/SKILL.md) · [English](README.en.md)
+[下载V2.2完整技能包](releases/job-search-team-V2.2.zip) · [版本对照](VERSION_HISTORY.md) · [下载V2.0独立助手](releases/resume-browser-assistant-V2.0.zip) · [仅Chrome扩展](releases/resume-browser-extension-V2.0.zip) · [从零安装](job-search-team/references/setup.md) · [技能入口](job-search-team/SKILL.md) · [English](README.en.md)
 
-V2.1（2026-11-08）更新：私有“问题及解决.md”与本地知识库的先查后处理、运行中及时同步，以及跨会话初始化工具。原有招聘者意向与每20岗复查保留；旧[V2.0技能包](releases/job-search-team-V2.0.zip)及历史版本不覆盖。本次助手运行代码未变。
+V2.2（2026-11-08）更新：私有“问题及解决.md”与本地知识库的先查后处理、运行中及时同步，以及跨会话初始化工具。原有招聘者意向与每20岗复查保留；旧[V2.0技能包](releases/job-search-team-V2.0.zip)及历史版本不覆盖。本次助手运行代码未变。
 
 ## 你只管决定什么工作值得去
 
